@@ -3011,7 +3011,8 @@ template <typename T> void forward_repeat_dim1(ggml_compute_params * params, ggm
         const int64_t i3 = b / ne2;
         const int64_t i2 = b % ne2;
 
-        T * src_base  = (T *) ((char *) src0->data + i2 * src0->nb[2] + i3 * src0->nb[3]);
+        // src0 may also be broadcast along dims 2 and 3 (e.g. {n, 1, 1, 1} -> {n, 1, m, 1})
+        T * src_base  = (T *) ((char *) src0->data + (i2 % src0->ne[2]) * src0->nb[2] + (i3 % src0->ne[3]) * src0->nb[3]);
         T * dst_batch = (T *) ((char *) dst->data + i2 * dst->nb[2] + i3 * dst->nb[3]);
 
         for (int64_t i1 = 0; i1 < ne1; i1++) {
